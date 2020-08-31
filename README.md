@@ -1,9 +1,4 @@
-# README #
-
-## Adamant(ium) ##
-### What is this repository for? ###
-
-* Fork of adamant tool project with necessary changes for sensors, bug fixes, code refactor and overall improvements.
+# A DiAlogue MANagement Tool (ADAMANT) #
 
 ### How do I get set up? ###
 
