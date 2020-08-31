@@ -1,0 +1,51 @@
+RequestResponse{
+    turns{magnitude:single,ordering:strict},
+    players{min:2},
+    player{name:MainUnit,roles{Commander}},
+    player{name:SensingUnit, roles{Receiver}},
+    store{name:MainUnitStore, owner{MainUnit}, structure:stack, visibility: public},
+    store{name:SensingUnitStore, owner{SensingUnit}, structure:queue, visibility: public},
+    roles{Commander,Receiver, Speaker, Listener},
+    principles{
+        Initial {scope:initial,
+            conditions{
+                Size(MainUnitStore, MainUnit, Empty),
+                Size(SensingUnitStore, SensingUnit, Empty)
+            },
+            effects{
+                Assign(MainUnit, Speaker),
+                Assign(SensingUnit, Listener)
+            }
+        },
+
+        PrincipleInitial{
+            scope:initial,
+            conditions{
+                Inrole(Speaker)
+            },
+            effects{
+                Move(Mandate, Next, Command, Speaker)
+            }
+        }
+    },
+    moves{
+        Command{
+            content{Content},
+            effects{
+                Store(Add, Artifact,MainUnitStore, MainUnit),
+                Store(Add, Artifact,SensingUnitStore, SensingUnit),
+                Move(Permit, Next, Response, Listener),
+                Move(Mandate, !Next, Command)
+            }
+        },
+        Response{
+            content{Content},
+            effects{
+                Store(Add, Artifact,MainUnitStore, MainUnit),
+                Store(Add, Artifact,SensingUnitStore, SensingUnit),
+                Move(Permit, Next, Command),
+                Move(Permit, Next, Response)
+            }
+        }
+    }
+}

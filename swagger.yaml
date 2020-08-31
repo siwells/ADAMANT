@@ -1,0 +1,250 @@
+swagger: "2.0"
+info:
+  title: Adamantium sensors
+  description: Routes for managing dialouges.
+  version: 1.0.0
+
+host: localhost:5000
+basePath: /
+schemes:
+  - http
+
+paths:
+  /dialogue:
+    get:
+      summary: Returns list of all dialogue definitions that given node is aware of.
+      description: All avaliable dialogue definitions are returned from the node.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: List of all dialogue definitions.
+          schema:
+            type: array
+            $ref: '#/definitions/dialogues'
+        default:
+          description: Error
+          schema:
+            type: object
+            $ref: '#/definitions/error'
+    post:
+      summary: Saves posted dialogue definition to the node's database.
+      description: Returns saved object.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Dialogue definition object that needs to be added to the node"
+          required: true
+          schema:
+            $ref: '#/definitions/dialogue'
+      responses:
+        201:
+          description: CREATED
+          schema:
+            type: object
+            $ref: '#/definitions/dialogue'
+        400:
+          description: PARAMS_MISSING
+        409:
+          description: ENTITY_EXISTS_CANNOT_CREATE
+        default:
+          description: Error
+          schema:
+            type: object
+            $ref: '#/definitions/error'
+  /dialogue/<id>:
+    get:
+      summary: Return dialogue definition with given id
+      operationId: getDialogueDef
+      parameters:
+        - name: id
+          in: path
+          description: Id of the dialogue definition
+          type: string
+          required: true
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/dialogue'
+        404:
+          description: ENTITY_NOT_FOUND
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/error'
+    delete:
+      summary: Delete given dialogue definition by id
+      operationId: deleteDialogueDef
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id of the dialogue definition
+          type: string
+      responses:
+        200:
+          description: OK
+        404:
+          description: ENTITY_NOT_FOUND
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/error'
+  /utterance:
+    post:
+      summary: Act of communication in the specified dialogue
+      operationId: speak
+      parameters:
+        - name: body
+          in: body
+          required: true
+          type: object
+          schema:
+            $ref: '#/definitions/utteranceBody'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/gameStatus'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/error'
+definitions:
+  dialogues:
+    type: array
+    items:
+      $ref: '#/definitions/dialogue'
+  dialogue:
+    type: object
+    properties:
+      id:
+        type: string
+      dialogueDescription:
+        type: string
+  error:
+    type: object
+    properties:
+      status_code:
+        type: integer
+      message:
+        type: string
+      payload:
+        type: object
+  utteranceBody:
+    type: object
+    properties:
+      dialogueId:
+        type: string
+        description: Dialogue id with which given utterance should be evaluated with
+        required: true
+      utterance:
+        $ref: '#/definitions/utterance'
+        required: true
+      gameStatus:
+        $ref: '#/definitions/gameStatus'
+        required: false
+  gameStatus:
+    type: object
+    required: false
+    description: If this utterance relates to ongoing dialogue this object should be passed, otherwise new communication is assumed
+    properties:
+      id:
+        type: string
+        description: Id of the given instance of game/dialogue status
+      dialogueId:
+        type: string
+        description: Id of the dialogue definition
+      availableMoves:
+        type: object
+        description: List of available moves
+        properties:
+          '!future':
+            type: array
+            items:
+              type: string
+          'future':
+            type: array
+            items:
+              type: string
+          '!next':
+            type: array
+            items:
+              type: string
+          'next':
+            type: array
+            items:
+              type: string
+      mandatoryMoves:
+        type: object
+        description: List of mandatory moves
+        properties:
+          '!future':
+            type: array
+            items:
+              type: string
+          'future':
+            type: array
+            items:
+              type: string
+          '!next':
+            type: array
+            items:
+              type: string
+          'next':
+            type: array
+            items:
+              type: string
+      initialTurn:
+        type: boolean
+        description: (deprecated) indicate if that is initial move
+      lastMove:
+        type: string
+        description: Identifier of the last move
+      speakers:
+        description: List of available speakers
+        type: array
+        items:
+          type: string
+      lastInteractionMove:
+        description: Last move for reference
+        $ref: '#/definitions/utterance'
+  utterance:
+    type: object
+    description: Essence of communication
+    required: true
+    properties:
+      moveName:
+        type: string
+        description: Move identifier
+        required: true
+      artifact:
+        type: object
+        description: Wrapper for the base information exchange
+        required: true
+        properties:
+          artifactKey:
+            type: string
+            description: Artifact identifier
+            required: true
+          data:
+            type: string
+            description: Core information being exchanged
+            required: true
+      playerName:
+        type: string
+        description: Node identifier as in dialogue definition (not node id)
+        required: true
+      role:
+        type: string
+        description: What is the current role of the node
+        required: true
+      final:
+        type: boolean
+        description: Is this the final message in the stream of messages
+        required: true
