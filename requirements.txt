@@ -1,7 +1,7 @@
 antlr4-python3-runtime==4.5.3
 click==6.7
 decorator==4.0.10
-Flask==0.12
+Flask==1.0
 Flask-JSON==0.3.2
 itsdangerous==0.24
 Jinja2==2.9.4
