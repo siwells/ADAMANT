@@ -1,5 +1,8 @@
 # A DiAlogue MANagement Tool (ADAMANT) #
 
+**ADAMANT should be considered pre-alpha softeware at present. It's an indicator of the direction we're heading in.**
+
+
 ### How do I get set up? ###
 
 Run `pip install -r requirements.txt`
